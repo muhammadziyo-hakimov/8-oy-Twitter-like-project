@@ -16,7 +16,7 @@ class User(AbstractUser):
         (VERIFIED, VERIFIED),
         (DONE, DONE),
     ]
-
+    
     phone = models.CharField(max_length=13, unique=True, null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=status_choices, default=NEW)
