@@ -1,8 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+
+from  django.contrib.auth import authenticate
+
 from main.utils import send_code
-from main.serializers import EmailSerializer, CodeSerializer, UserInfoSerializer
+from main.serializers import EmailSerializer, CodeSerializer, UserInfoSerializer, LoginSerializer
 from main.models.user import User, UserConfirmation, VERIFIED, DONE, NEW
 
 class SendCodeAPIView(APIView):
@@ -119,4 +122,26 @@ class SignUpAPIView(APIView):
             return Response({'status':'Error', 'message':"User already signed up. You can change your info in profile"})
 
 
+class LoginAPIView(APIView):
+    serializer_class = LoginSerializer
 
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data.get('username')
+        password = serializer.validated_data.get('password')
+
+        user = authenticate(request=request, username=username, password=password)
+
+        if user is not None:
+            return Response({
+                'status':'Success',
+                'message':'User logged in successfully',
+                'token': user.token()
+            }, status=200)
+        
+        return Response({
+            'status':'Error',
+            'message':'User not found'
+        })

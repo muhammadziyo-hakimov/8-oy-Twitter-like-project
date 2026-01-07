@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from main.models.user import User, NEW
+from main.models.user import User, NEW, DONE
+from main.utils import is_email, is_phone
+
+
 
 class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
@@ -27,9 +30,42 @@ class UserInfoSerializer(serializers.Serializer):
     password1 = serializers.CharField(min_length = 8, max_length = 16)
     password2 = serializers.CharField(min_length = 8, max_length = 16)
 
+    def validate_username(self, value:str):
+        user = User.objects.filter(username=value)
+        if user is not None:
+            raise serializers.ValidationError('Username already taken.')
+
     def validate_phone(self, value:str):
         if not value.startswith('+'):
             raise serializers.ValidationError('Phone number must start with +')
+        
+        user = User.objects.filter(phone=value)
+        if user is not None:
+            raise serializers.ValidationError('Phone number already used.')
+
         return value
+
     
-    
+class LoginSerializer(serializers.Serializer):
+    user_input = serializers.CharField(max_length = 200, required=True)
+    password = serializers.CharField(max_length = 16, required = True)
+
+    def validate(self, validated_data):
+        user_input = validated_data.get('user_input')
+        if is_email(user_input):
+            user = User.objects.filter(email=user_input).filter(status=DONE).first()
+            if user is not None:
+                validated_data['username'] = user.username
+            else:
+                raise serializers.ValidationError('User not found.')
+        elif is_phone(user_input):
+            user = User.objects.filter(phone=user_input).filter(status=DONE).first()
+            if user is not None:
+                validated_data['username'] = user.username
+            else:
+                raise serializers.ValidationError('User not found.')
+        else:
+            validated_data['username'] = user_input
+        
+        return validated_data
+
