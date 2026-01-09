@@ -3,6 +3,11 @@ from main.models.user import User, NEW, DONE
 from main.utils import is_email, is_phone
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+
 
 class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
@@ -14,6 +19,7 @@ class EmailSerializer(serializers.Serializer):
             raise serializers.ValidationError("A user with this email already VERIFIED.")
         return value
 
+
 class CodeSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6, required=True)
 
@@ -22,6 +28,7 @@ class CodeSerializer(serializers.Serializer):
             raise serializers.ValidationError("Code must be a 6-digit number.")
         return value
     
+
 class UserInfoSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length = 150)
     last_name = serializers.CharField(max_length = 150, required = False, allow_blank = True)

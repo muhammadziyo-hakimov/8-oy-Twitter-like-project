@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
 
 from  django.contrib.auth import authenticate
 
@@ -8,6 +9,8 @@ from main.utils import send_code
 from main.serializers import EmailSerializer, CodeSerializer, UserInfoSerializer, LoginSerializer
 from main.models.user import User, UserConfirmation, VERIFIED, DONE, NEW
 
+
+@extend_schema(tags=["Auth"])
 class SendCodeAPIView(APIView):
     serializer_class = EmailSerializer
     def post(self, request):
@@ -29,6 +32,7 @@ class SendCodeAPIView(APIView):
         return Response(data, status=200)
 
 
+@extend_schema(tags=["Auth"])
 class CodeVerificationAPIView(APIView):
     serializer_class = CodeSerializer
     permission_classes = [IsAuthenticated]
@@ -58,6 +62,7 @@ class CodeVerificationAPIView(APIView):
         return Response(data, status=200)
     
 
+@extend_schema(tags=["Auth"])
 class ResendCodeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -86,6 +91,7 @@ class ResendCodeAPIView(APIView):
             return True
         
 
+@extend_schema(tags=["Auth"])
 class SignUpAPIView(APIView):
     serializer_class = UserInfoSerializer
     permission_classes = [IsAuthenticated, ]
@@ -122,6 +128,7 @@ class SignUpAPIView(APIView):
             return Response({'status':'Error', 'message':"User already signed up. You can change your info in profile"})
 
 
+@extend_schema(tags=["Auth"])
 class LoginAPIView(APIView):
     serializer_class = LoginSerializer
 
