@@ -30,7 +30,7 @@ class MediaSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.Serializer):
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = '__all__'
         
 
 

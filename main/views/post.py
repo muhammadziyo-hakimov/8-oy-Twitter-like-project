@@ -103,7 +103,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, permission_classes = [IsAuthenticated])
     def my_commented_posts(self, request):
-        posts = Post.objects.filter(comment__user = request.user).distinct()  
+        posts = Post.objects.filter(comments__user = request.user).distinct()  
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
